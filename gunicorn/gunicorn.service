@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/Alicanto-Multi
+WorkingDirectory=/home/ubuntu/Alicanto_Multi
 ExecStart=/home/ubuntu/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/Alicanto_Multi/alicanto_multi_client/alicanto_multi_client.sock alicanto_multi_client.wsgi:application
 
 
