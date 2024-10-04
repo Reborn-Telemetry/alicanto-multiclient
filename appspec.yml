@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
     - source: /
-      destination: /home/ubuntu/Alicanto-Backend
+      destination: /home/ubuntu/Alicanto_Multi
 permissions:
-    - object: /home/ubuntu/Alicanto-Backend
+    - object: /home/ubuntu/Alicanto_Multi
       owner: ubuntu
       group: ubuntu
 hooks:
