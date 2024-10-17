@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Alicanto_Multi.apps.AlicantoMultiConfig',
-    'bus_signals.apps.BusSignalsConfig'
+    'bus_signals.apps.BusSignalsConfig',
+    'energy.apps.EnergyConfig',
+    'fusi.apps.FusiConfig',
+    'log.apps.LogConfig',
 ]
 
 MIDDLEWARE = [
