@@ -6,25 +6,27 @@ from django.contrib import messages
 
 
 def login_page(request):
-  if request.user.is_authenticated:
-    return redirect('bus-profile')
-  
-  if request.method == 'POST':
-    username = request.POST['username']
-    password = request.POST['password']
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-    try:
+        try:
             user = User.objects.get(username=username)
-    except:
+        except User.DoesNotExist:
             messages.error(request, 'El usuario no existe')
+            return render(request, 'login.html')
 
-    user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-    if user is not None:
+        if user is not None:
             login(request, user)
             messages.success(request, 'Ingresaste correctamente')
             return redirect('bus-profile')
-    else:
-            messages.error(request, 'nombre de usuario o contraseña incorrectos')
+        else:
+            messages.error(request, 'Nombre de usuario o contraseña incorrectos')
+            return render(request, 'login.html')
+
+    # Manejo de solicitudes GET
+    return render(request, 'login.html')
 
 # Create your views here.
