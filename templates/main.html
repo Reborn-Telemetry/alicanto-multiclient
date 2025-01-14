@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="{% static 'styles/main.css' %}" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+        <style>
+            .floating-button {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1050;
+             }
+
+             .chat-container {
+                font-size: 14px;
+                max-height: 400px;
+                overflow-y: auto;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: #f8f9fa;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+             }
+             .chat-container .message {
+                font-size: 14px;
+                max-width: 100%;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                padding: 10px;
+                border-radius: 10px;
+                display: inline-block;
+             }
+             .chat-container .message.user {
+                font-size: 14px;
+                align-self: flex-end;
+                background-color: #d1e7dd;
+                color: #000;
+             }
+             
+             /* Estilos para el mensaje del bot */
+             .chat-container .message.bot {
+                align-self: flex-start;
+                background-color: #f8d7da;
+                color: #000;
+             }
+             
+
+            /* Estilos de la barra lateral */
+            .sidebar {
+                width: 5.5rem;
+                transition: width 0.3s ease;
+                overflow: hidden;
+                background-color: #101034;
+                height: 100vh;
+                position: fixed; /* Fija la barra lateral en toda la altura */
+                z-index: 1000; /* Asegura que esté encima de otros elementos */
+            }
+
+            /* Expansión de la barra lateral al hacer hover */
+            .sidebar:hover {
+                width: 15rem;
+            }
+
+            /* Estilos para los enlaces en la barra lateral */
+            .sidebar .nav-link {
+                display: flex;
+                align-items: center;
+                color: #ffffff;
+                transition: color 0.3s ease;
+            }
+
+            /* Estilo de los textos junto a los iconos, ocultos por defecto */
+            .sidebar .nav-link .link-text {
+                display: none;
+                margin-left: 10px;
+                font-size: 16px;
+                white-space: nowrap;
+            }
+
+            /* Muestra el texto cuando la barra está expandida */
+            .sidebar:hover .nav-link .link-text {
+                display: inline;
+            }
+
+            /* Ajusta el contenido principal para que esté a la derecha de la barra lateral */
+            .content {
+                margin-left: 5.5rem; /* Compensa el ancho de la barra lateral */
+                transition: margin-left 0.3s ease;
+                padding: 1rem;
+            }
+
+            /* Ajusta el margen izquierdo cuando la barra lateral se expande */
+            .sidebar:hover + .content {
+                margin-left: 15rem;
+            }
+
+            /* Estilo para la zona de notificaciones */
+            .toast-container {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 9999;
+            }
+        </style>
+
+        <title>{% block title %}Alicanto Telemetria{% endblock title %}</title>
+    </head>
+    <body>
+        {% if messages %}
+        <div class="toast-container" aria-live="polite" aria-atomic="true">
+            {% for message in messages %}
+            <div
+                class="toast align-items-center text-white bg-dark"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                id="toast{{ forloop.counter }}"
+            >
+                <div class="d-flex">
+                    <div class="toast-body">{{ message }}</div>
+                    <button
+                        type="button"
+                        class="btn-close me-2 m-auto"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"
+                    ></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Barra lateral -->
+        <div class="sidebar d-flex flex-column flex-shrink-0 justify-content-center align-items-center">
+            <a
+                href="/"
+                class="d-block p-3 link-dark text-decoration-none"
+                title="Icon-only"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
+            >
+                <img alt="logoReborn" src="{% static "images/reblogo2.png" %}" style="width:70px">
+            </a>
+            <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                <li>
+                    <a href="{% url 'simple_dashboard' %}" class="nav-link py-4" title="Dashboard">
+                        <i class="bx bx-home-alt-2 bi"></i>
+                        <span class="link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Reportes">
+                        <i class="bx bx-pie-chart-alt-2 bi"></i>
+                        <span class="link-text">Reportes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Alertas">
+                        <i class="bx bx-error-circle bi"></i>
+                        <span class="link-text">Alertas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Alertas">
+                        <i class="bx bx-error bi"></i>
+                        <span class="link-text">Fusi Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Flota">
+                        <i class="bx bx-bus bi"></i>
+                        <span class="link-text">Flota</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Diccionario Fusi">
+                        <i class="bx bx-book bi"></i>
+                        <span class="link-text">Diccionario Fusi</span>
+                    </a>
+                </li>
+                {% if user.username in 'hurbx' or user.username in 'Bquilincheo' %}
+                    <li>
+                        <a href="{% url 'no-access' %}" class="nav-link py-4" title="Programacion Buses">
+                            <i class="bx bx-objects-vertical-bottom bi"></i>
+                            <span class="link-text">Calculo Disponibilidad</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{% url 'no-access' %}" class="nav-link py-4" title="Programacion Buses">
+                            <i class="bx bx-objects-vertical-bottom bi"></i>
+                            <span class="link-text">Calculo Disponibilidad</span>
+                        </a>
+                    </li>
+                    {% endif %}
+             
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Informe Disponibilidad">
+                        <i class="bx bx-calendar-check bi"></i>
+                        <span class="link-text">Informe Disponibilidad</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Staff">
+                        <i class="bx bx-user-pin bi"></i>
+                        <span class="link-text">Staff</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Crear Parte">
+                        <i class="bx bx-edit-alt bi"></i>
+                        <span class="link-text">Crear Parte</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'no-access' %}" class="nav-link py-4" title="Gestion energia">
+                        <i class="bx bx-bolt-circle bi"></i>
+                        <span class="link-text">Gestion energia</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="content">
+            <nav
+                class="navbar sticky-top"
+                style="background-color: #ededed; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; margin-bottom: 20px"
+            >
+                <div class="container-fluid">
+                    <a class="navbar-brand">{% block page %}{% endblock page %}</a>
+                    <div class="d-flex">
+                        <div class="dropstart">
+                            <a
+                                href="#"
+                                class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle"
+                                id="dropdownUser3"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <div class="d-flex align-items-center">
+                                    <i
+                                        class="bx bx-user user"
+                                        style="font-size: 20px; color: #0f8bfd; margin-right: 10px"
+                                    ></i>
+                                    <span style="font-size: 20px; color: #0f8bfd">{{ user.username }}</span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" href="">Cerrar Sesion</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {% block content %}{% endblock content %}
+        </div>
+        <!--chatbot offcanvas-->
+        <button
+            class="btn btn-primary floating-button"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#chatOffcanvas"
+            aria-controls="chatOffcanvas"
+        >
+            <i class="bx bx-chat"></i>
+        </button>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="chatOffcanvas" aria-labelledby="chatOffcanvasLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="chatOffcanvasLabel">Reborn Chatbot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div style='font-size: 14px' class="offcanvas-body d-flex flex-column">
+                <!-- Contenedor de mensajes del chatbot -->
+                <div style='font-size: 14px' class="chat-container flex-grow-1 mb-3" id="chatContainer">
+                    <!-- Los mensajes del chatbot aparecerán aquí -->
+                </div>
+                <!-- Input para escribir mensajes -->
+                <div style='font-size: 14px' class="input-group">
+                    <input type="text" id="userInput" class="form-control" placeholder="Escribe tu mensaje aquí..." />
+                    <button id="sendButton" class="btn btn-primary">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <!--chatbot off canvas-->
+        <script>
+            const chatContainer = document.getElementById("chatContainer");
+            const userInput = document.getElementById("userInput");
+            const sendButton = document.getElementById("sendButton");
+            
+            const LINE_LENGTH = 80; // Número de caracteres por línea
+            
+            // Función para dividir texto en líneas
+            function formatMessage(message, lineLength) {
+                const regex = new RegExp(`.{1,${lineLength}}`, "g"); // Divide el texto en bloques de tamaño `lineLength`
+                return message.match(regex).join("\n"); // Une los bloques con saltos de línea
+            }
+            
+            // Función para añadir mensajes al contenedor del chat
+            function addMessage(text, sender) {
+                const formattedText = formatMessage(text, LINE_LENGTH); // Da formato al texto
+                const messageDiv = document.createElement("div");
+                messageDiv.className = sender === "user" ? "text-end mb-2 message user" : "text-start mb-2 message bot";
+                const messageText = document.createElement("span");
+                messageText.className = "text";
+                messageText.innerText = formattedText; // Añade el texto formateado
+                messageDiv.appendChild(messageText);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight; // Desplaza automáticamente hacia abajo
+            }
+            
+            // Función para enviar el mensaje
+            async function sendMessage() {
+                const userMessage = userInput.value.trim();
+                if (!userMessage) return;
+            
+                addMessage(userMessage, "user"); // Muestra el mensaje del usuario
+                userInput.value = "";
+            
+                try {
+                    const response = await fetch("/chatbot/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ message: userMessage }),
+                    });
+            
+                    const data = await response.json();
+            
+                    if (data.response) {
+                        addMessage(data.response, "bot"); // Muestra la respuesta del bot
+                    } else {
+                        addMessage("Error: No response from server.", "bot");
+                    }
+                } catch (error) {
+                    addMessage("Error: Could not connect to server.", "bot");
+                }
+            }
+            
+            // Maneja el clic del botón "Enviar"
+            sendButton.addEventListener("click", sendMessage);
+            
+            // Maneja el envío al presionar la tecla Enter
+            userInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") sendMessage();
+            });
+        </script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toasts = document.querySelectorAll(".toast");
+                toasts.forEach((toast) => {
+                    const toastInstance = new bootstrap.Toast(toast);
+                    toastInstance.show();
+                });
+            });
+        </script>
+    </body>
+</html>

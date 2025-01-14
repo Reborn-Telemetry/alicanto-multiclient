@@ -1,9 +1,7 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
-
 
 def login_page(request):
     if request.method == 'POST':
@@ -21,12 +19,9 @@ def login_page(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Ingresaste correctamente')
-            return redirect('pages/bus-profile')
+            return redirect('simple_dashboard')  # Redirigir al nombre de la URL
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos')
             return render(request, 'login.html')
 
-    # Manejo de solicitudes GET
     return render(request, 'login.html')
-
-# Create your views here.
