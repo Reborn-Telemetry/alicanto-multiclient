@@ -21,7 +21,7 @@ def login_page(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Ingresaste correctamente')
-            return redirect('bus-profile')
+            return redirect('pages/bus-profile')
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos')
             return render(request, 'login.html')
