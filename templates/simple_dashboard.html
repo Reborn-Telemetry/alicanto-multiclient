@@ -4,5 +4,22 @@
 <h1 style="color: #0f8bfd; font-weight: 700; font-size: 30px">Dashboard Bus</h1>
 {% endblock page %} 
 {% block content %}
-hola
+<link rel="stylesheet" href="{% static 'styles/newcards.css' %}" />
+<div class="container-fluid concen">
+    <div class="row rowcen">
+        <section class="cards">
+            <article class="card card--1">
+              <div class="card__img"></div>
+              <a href="#" class="card_link">
+                 <div class="card__img--hover"></div>
+               </a>
+              <div class="card__info">
+                <span class="card__category"> Ancali</span>
+                <h3 class="card__title">Bus 188</h3>
+                <span class="card__by">by <a href="#" class="card__author" title="author">Reborn Electric</a></span>
+              </div>
+            </article>
+        </section>
+    </div>
+</div>
 {% endblock content %}
