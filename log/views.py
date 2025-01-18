@@ -24,4 +24,4 @@ def login_page(request):
             messages.error(request, 'Nombre de usuario o contraseña incorrectos')
             return render(request, 'login.html')
 
-    return render(request, 'login.html')
+    return render(request, 'log.html')
